@@ -1,0 +1,44 @@
+﻿@page
+@model KarenderyaWebApp.Pages.Admin.Reports.IndexModel
+
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card border-0 shadow-sm text-center p-4">
+                <div class="card-body py-5">
+
+                    <div class="mb-4">
+                        <i class="bi bi-bar-chart-line display-3 text-primary"></i>
+                    </div>
+
+                    <h2 class="fw-bold mb-3">Reports Coming Soon!</h2>
+
+                    <p class="text-muted mb-4">
+                        The Reports feature is currently under development.
+                        In a future update, you'll be able to view and monitor
+                        your sales reports by daily, weekly, and monthly periods.
+                    </p>
+
+                    <div class="alert alert-info text-start">
+                        <strong>Good to know!</strong>
+                        <p class="mb-0 mt-1">
+                            You can view your recent orders on the Admin Dashboard
+                            while we work on the reporting features.
+                        </p>
+                    </div>
+
+                    <a asp-page="/Admin/Dashboard/Index"
+                       class="btn btn-primary mt-3">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Back to Dashboard
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

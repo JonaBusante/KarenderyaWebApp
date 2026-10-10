@@ -1,0 +1,299 @@
+﻿@page
+@model KarenderyaWebApp.Pages.Cashier.Dashboard.IndexModel
+
+@{
+    ViewData["Title"] = "Cashier Dashboard";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Cashier Dashboard</h2>
+            <p class="text-muted mb-0">
+                Manage customer orders and check today's food availability.
+            </p>
+        </div>
+
+        <a asp-page="/Cashier/CreateOrders/Index"
+           class="btn btn-success btn-lg">
+            <i class="bi bi-plus-circle me-2"></i>Create Order
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Orders Today</span>
+                        <span class="rounded-3 bg-primary-subtle text-primary p-2">
+                            <i class="bi bi-receipt fs-4"></i>
+                        </span>
+                    </div>
+                    <h3 class="fw-bold mb-1">@Model.OrdersToday</h3>
+                    <small class="text-muted">Orders processed today</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Today's Sales</span>
+                        <span class="rounded-3 bg-success-subtle text-success p-2">
+                            <i class="bi bi-cash-stack fs-4"></i>
+                        </span>
+                    </div>
+                    <h3 class="fw-bold mb-1">@Model.SalesToday.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-PH"))</h3>
+                    <small class="text-muted">Total sales recorded today</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Available Food Items</span>
+                        <span class="rounded-3 bg-warning-subtle text-warning p-2">
+                            <i class="bi bi-egg-fried fs-4"></i>
+                        </span>
+                    </div>
+                    <h3 class="fw-bold mb-1">@Model.AvailableFoodItems</h3>
+                    <small class="text-muted">Menu items currently in stock</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Food Availability -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white border-0 px-4 pt-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h5 class="fw-bold mb-1">Food Availability</h5>
+                    <p class="text-muted small mb-0">
+                        Check prices and stock before creating an order.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="foodTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Food Item</th>
+                            <th>Price</th>
+                            <th>Available Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.FoodItems.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    No menu items found.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var food in Model.FoodItems)
+                            {
+                                var outOfStock = food.AvailableQuantity <= 0 || !food.IsAvailable;
+                                var lowStock = !outOfStock && food.AvailableQuantity <= 5;
+
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@food.Name</div>
+                                    </td>
+
+                                    <td>
+                                        @food.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-PH"))
+                                    </td>
+
+                                    <td>
+                                        @food.AvailableQuantity servings
+                                    </td>
+
+                                    <td>
+                                        @if (outOfStock)
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger">Unavailable</span>
+                                        }
+                                        else if (lowStock)
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning"> Low Stock </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success-subtle text-success"> Available </span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Previous Orders -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 px-4 pt-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h5 class="fw-bold mb-1">Previous Orders</h5>
+                    <p class="text-muted small mb-0"> Double-click an order to view its details. </p>
+                </div>
+
+                <a asp-page="/Cashier/Dashboard/Orders" class="btn btn-outline-success btn-sm"> View All Orders </a>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date &amp; Time</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.RecentOrders.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-receipt fs-1 d-block mb-2"></i>
+                                    No previous orders to display.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var order in Model.RecentOrders)
+                            {
+                                <tr class="order-row" data-order-modal="orderModal_@order.OrderId" title="Double-click to view order details" style="cursor: pointer;">
+                                    <td class="fw-semibold"> #@order.OrderId </td>
+                                    <td> @order.OrderDate.ToString("MMM dd, yyyy hh:mm tt") </td>
+                                    <td> @order.OrderItems.Sum(item => item.Quantity) </td>
+                                    <td class="fw-semibold"> @order.TotalAmount.ToString("C2",System.Globalization.CultureInfo.GetCultureInfo("en-PH")) </td>
+                                </tr>
+                             }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modals -->
+@foreach (var order in Model.RecentOrders)
+{
+        <div class="modal fade" id="orderModal_@order.OrderId" tabindex="-1" aria-labelledby="orderModalLabel_@order.OrderId" aria-hidden="true">
+
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow">
+
+                    <div class="modal-header bg-success text-white">
+                        <div>
+                            <h5 class="modal-title fw-bold"
+                                id="orderModalLabel_@order.OrderId">
+                                Order Details #@order.OrderId
+                            </h5>
+
+                            <small>
+                                @order.OrderDate.ToString("MMM dd, yyyy hh:mm tt")
+                            </small>
+                        </div>
+
+                        <button type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                        </button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Food Item</th>
+                                        <th class="text-center">Quantity</th>
+                                        <th class="text-end">Unit Price</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        <tr>
+                                            <td>@(item.FoodItem?.Name ?? "Unknown Item")</td>
+                                            <td class="text-center"> @item.Quantity</td>
+                                            <td class="text-end"> @item.UnitPrice.ToString("C2",System.Globalization.CultureInfo.GetCultureInfo("en-PH")) </td>
+                                            <td class="text-end">@((item.UnitPrice * item.Quantity).ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-PH")))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="3" class="text-end"> Total Amount </th>
+                                        <th class="text-end text-success">@order.TotalAmount.ToString("C2",System.Globalization.CultureInfo.GetCultureInfo("en-PH"))</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="text-muted small">
+                        Total items: @order.OrderItems.Sum(item => item.Quantity)
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    }
+
+@section Scripts {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                document.querySelectorAll(".order-row").forEach(function (row) {
+                    row.addEventListener("dblclick", function () {
+                        const modalId = row.dataset.orderModal;
+                        const modalElement = document.getElementById(modalId);
+
+                        if (modalElement) {
+                            bootstrap.Modal
+                                .getOrCreateInstance(modalElement)
+                                .show();
+                        }
+                    });
+                });
+            });
+        </script>
+}
